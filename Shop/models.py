@@ -55,7 +55,11 @@ class Cart(models.Model):
 
     def __str__(self):
         return str(self.id)
-
+    
+    @property
+    def total_cost(self):
+        return self.quantity * self.product.discounted_price
+    
 
 
 STATUS_CHOICE = (
@@ -66,6 +70,19 @@ STATUS_CHOICE = (
     ('Cancel','Cancel')
 )
 
+PAYMENT_METHOD_CHOICE = (
+    ('COD', 'Cash on Delivery'),
+    ('CC', 'Credit Card'),
+    ('DC', 'Debit Card'),
+    ('MB', 'Mobile Banking'),
+)
+
+PAYMENT_STATUS_CHOICE = (
+    ('Pending', 'Pending'),
+    ('Completed', 'Completed'),
+    ('Failed', 'Failed'),
+)
+
 class OrderPlaced(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
@@ -73,5 +90,11 @@ class OrderPlaced(models.Model):
     quantity = models.PositiveIntegerField(default=1)
     ordered_date = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=50, choices=STATUS_CHOICE, default='Pending')
+    payment_method = models.CharField(max_length=50, choices=PAYMENT_METHOD_CHOICE, default='COD')
+    payment_status = models.CharField(max_length=50, choices=PAYMENT_STATUS_CHOICE, default='Pending')
+
+    @property
+    def total_cost(self):
+     return self.quantity * self.product.discounted_price
 
 

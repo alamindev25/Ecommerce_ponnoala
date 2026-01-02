@@ -3,7 +3,7 @@ from django.contrib.auth.forms import UserCreationForm,AuthenticationForm,Userna
 from django.contrib.auth.models import User
 from django.utils.translation import gettext,gettext_lazy as _
 from django.contrib.auth import password_validation
-from .models import Customer
+from .models import Customer, OrderPlaced
  # Registration
  
 class CustomerRegistrationForm(UserCreationForm):
@@ -49,6 +49,55 @@ class CustomerProfileForm(forms.ModelForm):
             'villorroad':forms.TextInput(attrs={'class':'form-control'}),
             'zipcode':forms.NumberInput(attrs={'class':'form-control'}),
         }
+
+# Payment Form
+class PaymentForm(forms.Form):
+    PAYMENT_CHOICES = (
+        ('COD', 'Cash on Delivery'),
+        ('CC', 'Credit Card'),
+        ('DC', 'Debit Card'),
+        ('MB', 'Mobile Banking'),
+    )
     
+    payment_method = forms.ChoiceField(
+        widget=forms.RadioSelect,
+        choices=PAYMENT_CHOICES,
+        required=True
+    )
     
+    card_number = forms.CharField(
+        max_length=16,
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': '1234 5678 9012 3456'})
+    )
+    
+    expiry_month = forms.CharField(
+        max_length=2,
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'MM'})
+    )
+    
+    expiry_year = forms.CharField(
+        max_length=4,
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'YYYY'})
+    )
+    
+    cvv = forms.CharField(
+        max_length=4,
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'XXX'})
+    )
+    
+    bank_name = forms.CharField(
+        max_length=100,
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Bank Name'})
+    )
+    
+    mobile_number = forms.CharField(
+        max_length=11,
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': '01XXXXXXXXX'})
+    )
     

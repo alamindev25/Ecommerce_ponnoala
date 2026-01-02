@@ -25,7 +25,7 @@
                                     <a class="plus-cart btn" pid="{{ cart.product.id }}"><i class="fas fa-plus-square fa-lg"></i></a>
                                 </div>
                                 <div class="d-flex justify-content-between">
-                                    <a href="#" class="btn btn-sm btn-info  text-white mr-3">Remove item </a>
+                                    <a href="#" class="btn btn-sm btn-info  text-white mr-3 remove-cart" pid="{{ cart.product.id }}">Remove item </a>
                                     <p class="mb-0"><span><strong>Tk. {{ cart.product.discounted_price }}</strong></span></p>
                                 </div>
                             </div>
@@ -83,7 +83,7 @@
                             <span><strong>Tk. {{ totalamount }}</strong></span>
                         </li>
                     </ul>
-                    <div class="d-grid"><a href="#" class="btn btn-primary">Place Order</a></div>
+                    <div class="d-grid"><a href="{% url 'checkout' %}" class="btn btn-primary">Place Order</a></div>
                 </div>
             </div>
         </div> 

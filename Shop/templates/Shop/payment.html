@@ -1,0 +1,142 @@
+{% extends 'Shop/base.html' %}
+{% load static %}
+{% block title %}Payment{% endblock title %}
+{% block main-content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h2 class="mb-4">Payment Information</h2>
+            <div class="card">
+                <div class="card-body">
+                    <form method="post" action="{% url 'payment-page' %}">
+                        {% csrf_token %}
+                        
+                        <!-- Payment Method Selection -->
+                        <h4 class="mb-3">Select Payment Method</h4>
+                        <div class="mb-4">
+                            {% for radio in form.payment_method %}
+                                <div class="form-check mb-3">
+                                    {{ radio.tag }}
+                                    <label class="form-check-label">
+                                        {{ radio.choice_label }}
+                                    </label>
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Card Payment Fields -->
+                        <div id="card-payment" class="payment-section" style="display: none;">
+                            <h5 class="mb-3">Credit/Debit Card Details</h5>
+                            <div class="mb-3">
+                                <label for="card_number" class="form-label">Card Number</label>
+                                {{ form.card_number }}
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="expiry_month" class="form-label">Expiry Month (MM)</label>
+                                        {{ form.expiry_month }}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="expiry_year" class="form-label">Expiry Year (YYYY)</label>
+                                        {{ form.expiry_year }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="cvv" class="form-label">CVV</label>
+                                {{ form.cvv }}
+                            </div>
+                        </div>
+
+                        <!-- Mobile Banking Fields -->
+                        <div id="mobile-banking" class="payment-section" style="display: none;">
+                            <h5 class="mb-3">Mobile Banking Details</h5>
+                            <div class="mb-3">
+                                <label for="mobile_number" class="form-label">Mobile Number (01XXXXXXXXX)</label>
+                                {{ form.mobile_number }}
+                            </div>
+                            <p class="text-muted small">You will receive payment confirmation on this number</p>
+                        </div>
+
+                        <!-- Bank Transfer Fields -->
+                        <div id="bank-transfer" class="payment-section" style="display: none;">
+                            <h5 class="mb-3">Bank Transfer Details</h5>
+                            <div class="mb-3">
+                                <label for="bank_name" class="form-label">Bank Name</label>
+                                {{ form.bank_name }}
+                            </div>
+                            <p class="text-muted small">Please transfer the amount to our bank account details provided after order confirmation</p>
+                        </div>
+
+                        <!-- COD Message -->
+                        <div id="cod-message" class="payment-section" style="display: none;">
+                            <div class="alert alert-info">
+                                <h5>Cash on Delivery</h5>
+                                <p>You can pay when your order is delivered. Make sure to keep the exact amount ready.</p>
+                            </div>
+                        </div>
+
+                        <!-- Error Messages -->
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+
+                        <!-- Form Errors -->
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {% for error in form.non_field_errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        <!-- Submit Button -->
+                        <div class="text-end mt-4">
+                            <button type="submit" class="btn btn-success btn-lg px-5">Proceed to Payment</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const paymentMethodInputs = document.querySelectorAll('input[name="payment_method"]');
+    
+    function showPaymentFields() {
+        // Hide all sections first
+        document.getElementById('card-payment').style.display = 'none';
+        document.getElementById('mobile-banking').style.display = 'none';
+        document.getElementById('bank-transfer').style.display = 'none';
+        document.getElementById('cod-message').style.display = 'none';
+        
+        // Show selected section
+        const selectedMethod = document.querySelector('input[name="payment_method"]:checked').value;
+        
+        if (selectedMethod === 'CC' || selectedMethod === 'DC') {
+            document.getElementById('card-payment').style.display = 'block';
+        } else if (selectedMethod === 'MB') {
+            document.getElementById('mobile-banking').style.display = 'block';
+        } else if (selectedMethod === 'COD') {
+            document.getElementById('cod-message').style.display = 'block';
+        }
+    }
+    
+    // Add event listeners to radio buttons
+    paymentMethodInputs.forEach(input => {
+        input.addEventListener('change', showPaymentFields);
+    });
+    
+    // Show initial payment method fields
+    showPaymentFields();
+</script>
+{% endblock main-content %}
