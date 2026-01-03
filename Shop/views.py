@@ -23,7 +23,10 @@ class ProductView(View):
 class ProductDetail(View):
  def get(self,request,pk):
   product=Product.objects.get(pk=pk)
-  return render (request,'Shop/productdetail.html',{'product':product})
+  item_allready_in_cart=False
+  if request.user.is_authenticated:
+   item_allready_in_cart=Cart.objects.filter(Q(product=product.id) & Q(user=request.user)).exists()
+  return render (request,'Shop/productdetail.html',{'product':product, 'item_allready_in_cart': item_allready_in_cart})
   
  
 
@@ -204,34 +207,34 @@ def remove_cart(request):
   }
   return JsonResponse(data)
  
-def payment_page(request):
- if request.method == 'POST':
-  form = PaymentForm(request.POST)
-  if form.is_valid():
-   payment_method = form.cleaned_data.get('payment_method')
+# def payment_page(request):
+#  if request.method == 'POST':
+#   form = PaymentForm(request.POST)
+#   if form.is_valid():
+#    payment_method = form.cleaned_data.get('payment_method')
    
-   # Validate payment method specific fields
-   if payment_method in ['CC', 'DC']:
-    card_number = form.cleaned_data.get('card_number')
-    cvv = form.cleaned_data.get('cvv')
-    if not card_number or not cvv:
-     messages.error(request, 'Card details are required')
-     return redirect('payment-page')
-   elif payment_method == 'MB':
-    mobile_number = form.cleaned_data.get('mobile_number')
-    if not mobile_number:
-     messages.error(request, 'Mobile number is required')
-     return redirect('payment-page')
+#    # Validate payment method specific fields
+#    if payment_method in ['CC', 'DC']:
+#     card_number = form.cleaned_data.get('card_number')
+#     cvv = form.cleaned_data.get('cvv')
+#     if not card_number or not cvv:
+#      messages.error(request, 'Card details are required')
+#      return redirect('payment-page')
+#    elif payment_method == 'MB':
+#     mobile_number = form.cleaned_data.get('mobile_number')
+#     if not mobile_number:
+#      messages.error(request, 'Mobile number is required')
+#      return redirect('payment-page')
    
-   # Store payment method in session
-   request.session['payment_method'] = payment_method
-   request.session['payment_status'] = 'Completed'
+#    # Store payment method in session
+#    request.session['payment_method'] = payment_method
+#    request.session['payment_status'] = 'Completed'
    
-   return redirect('payment-done')
- else:
-  form = PaymentForm()
+#    return redirect('payment-done')
+#  else:
+#   form = PaymentForm()
  
- return render(request, 'Shop/payment.html', {'form': form})
+#  return render(request, 'Shop/payment.html', {'form': form})
 
 @login_required
 def payment_done(request):
@@ -239,11 +242,10 @@ def payment_done(request):
  custid=request.GET.get('custid')
  customer=Customer.objects.get(id=custid)
  cart=Cart.objects.filter(user=user)
- payment_method = request.session.get('payment_method', 'COD')
- payment_status = request.session.get('payment_status', 'Pending')
+ 
  
  for c in cart:
-  OrderPlaced(user=user,customer=customer,product=c.product,quantity=c.quantity,payment_method=payment_method,payment_status=payment_status).save()
+  OrderPlaced(user=user,customer=customer,product=c.product,quantity=c.quantity,).save()
   c.delete()
  
  messages.success(request, f'Order placed successfully! Payment method: {payment_method}')
