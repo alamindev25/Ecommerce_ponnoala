@@ -10,23 +10,29 @@ from django.utils.decorators import method_decorator
 # Create your views here.
 class ProductView(View):
  def get(self, request):
+  totoalitem=0
   gentspants = Product.objects.filter(category='GP')
   sares = Product.objects.filter(category='S')
   borkhs = Product.objects.filter(category='BK')
   lehengas=Product.objects.filter(category='L')
   babyfashions = Product.objects.filter(category='BF')
-  return render(request, 'Shop/home.html', {'gentspants':gentspants, 'sares':sares,'borkhs':borkhs,'lehengas':lehengas,'babyfashions':babyfashions})
+  if request.user.is_authenticated:
+   totoalitem=len(Cart.objects.filter(user=request.user))
+  return render(request, 'Shop/home.html', {'gentspants':gentspants, 'sares':sares,'borkhs':borkhs,'lehengas':lehengas,'babyfashions':babyfashions,'totoalitem':totoalitem})
 
 #def product_detail(request):
 # return render(request, 'Shop/productdetail.html')
 
 class ProductDetail(View):
  def get(self,request,pk):
+  totoalitem=0
   product=Product.objects.get(pk=pk)
   item_allready_in_cart=False
   if request.user.is_authenticated:
+   totoalitem=len(Cart.objects.filter(user=request.user))
+   
    item_allready_in_cart=Cart.objects.filter(Q(product=product.id) & Q(user=request.user)).exists()
-  return render (request,'Shop/productdetail.html',{'product':product, 'item_allready_in_cart': item_allready_in_cart})
+  return render (request,'Shop/productdetail.html',{'product':product, 'item_allready_in_cart': item_allready_in_cart,'totoalitem':totoalitem})
   
  
 
@@ -247,6 +253,5 @@ def payment_done(request):
  for c in cart:
   OrderPlaced(user=user,customer=customer,product=c.product,quantity=c.quantity,).save()
   c.delete()
- 
- messages.success(request, f'Order placed successfully! Payment method: {payment_method}')
+
  return redirect("orders")

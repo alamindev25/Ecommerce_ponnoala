@@ -12,7 +12,7 @@
             <hr>
             <p>Product Description:{{product.description}} </p> <br>
             <h4>Tk.{{product.discounted_price}} <small class="fw-light text-decoration-line-through">{{product.selling_price}}</small></h4> <br>
-             {% if not item_allready_in_cart %}
+             {% if  item_allready_in_cart %}
             <a href="{% url 'showcart' %}" class="btn btn-orning shadow px-5 py-2 ms-4">Go to cart</a>
             {% else %} 
             <form action="/add_to_cart" class="d-inline">
