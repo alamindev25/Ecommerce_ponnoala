@@ -93,6 +93,7 @@ class OrderPlaced(models.Model):
     # payment_method = models.CharField(max_length=50, choices=PAYMENT_METHOD_CHOICE, default='COD')
     # payment_status = models.CharField(max_length=50, choices=PAYMENT_STATUS_CHOICE, default='Pending')
 
+
     @property
     def total_cost(self):
      return self.quantity * self.product.discounted_price
